@@ -7,7 +7,7 @@
 додати в кінець workbook
 '''
 
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, Font, NamedStyle, Border, Side
 from openpyxl import load_workbook
 from datetime import datetime
 
@@ -32,10 +32,10 @@ class Report:
         return my_title
 
     # collect time from all sheets and put ot total_data_structure
-    def collect_time(self, total_data_structure, yr='19', end='56'):
-        end_sheet = end             # worksheet for stop calculating
-        year = yr                   # default year for calculating
-        tds = total_data_structure  # data structure for total flight-time
+    def collect_time(self, total_data, yr='19', end='56'):
+        end_sheet = end                      # worksheet for stop calculating
+        year = yr                            # default year for calculating
+        tds = total_data.months_flight_time  # data structure for total flight-time
 
         for sh in self.Name_Sheets:  # list of sheet names
             # if title is digit (not report) and title not later 2019
@@ -59,6 +59,13 @@ class Report:
 
     # create form of summary
     def create_workspace(self, total_data):
+        flt = total_data.months_flight_time
+
+        # Style preparing
+        bd = Side(style='medium')
+        set_border = Border(left=bd, bottom=bd, right=bd, top=bd)
+
+
         # insert current time into A1
         self.workSh['A1'].value = self.ExecutionTime.strftime('%d-%m-%y')
 
@@ -108,34 +115,35 @@ class Report:
         self.workSh['J2'] = 'LANDINGS TOTAL'
         self.workSh.column_dimensions['J'].width = 10
 
-        self.workSh['A4'].value = total_data['01']['sum'][1]
-        self.workSh['J4'].value = total_data['01']['sum'][0]
-        self.workSh['A5'].value = total_data['02']['sum'][1]
-        self.workSh['J5'].value = total_data['02']['sum'][0]
-        self.workSh['A6'].value = total_data['03']['sum'][1]
-        self.workSh['J6'].value = total_data['03']['sum'][0]
-        self.workSh['A7'].value = total_data['04']['sum'][1]
-        self.workSh['J7'].value = total_data['04']['sum'][0]
-        self.workSh['A8'].value = total_data['05']['sum'][1]
-        self.workSh['J8'].value = total_data['05']['sum'][0]
-        self.workSh['A9'].value = total_data['06']['sum'][1]
-        self.workSh['J9'].value = total_data['06']['sum'][0]
+        self.workSh['A4'].value = flt['01']['sum'][1]
+        self.workSh['J4'].value = flt['01']['sum'][0]
+        self.workSh['A5'].value = flt['02']['sum'][1]
+        self.workSh['J5'].value = flt['02']['sum'][0]
+        self.workSh['A6'].value = flt['03']['sum'][1]
+        self.workSh['J6'].value = flt['03']['sum'][0]
+        self.workSh['A7'].value = flt['04']['sum'][1]
+        self.workSh['J7'].value = flt['04']['sum'][0]
+        self.workSh['A8'].value = flt['05']['sum'][1]
+        self.workSh['J8'].value = flt['05']['sum'][0]
+        self.workSh['A9'].value = flt['06']['sum'][1]
+        self.workSh['J9'].value = flt['06']['sum'][0]
         self.workSh['A10'].value = 'TOTALS 6mo'
-        self.workSh['J10'].value = 0
+        self.workSh['J10'].value = total_data.JAN_JUN_sum
 
-        self.workSh['A11'].value = total_data['07']['sum'][1]
-        self.workSh['J11'].value = total_data['07']['sum'][0]
-        self.workSh['A12'].value = total_data['08']['sum'][1]
-        self.workSh['J12'].value = total_data['08']['sum'][0]
-        self.workSh['A13'].value = total_data['09']['sum'][1]
-        self.workSh['J13'].value = total_data['09']['sum'][0]
-        self.workSh['A14'].value = total_data['10']['sum'][1]
-        self.workSh['J14'].value = total_data['10']['sum'][0]
-        self.workSh['A15'].value = total_data['11']['sum'][1]
-        self.workSh['J15'].value = total_data['11']['sum'][0]
-        self.workSh['A16'].value = total_data['12']['sum'][1]
-        self.workSh['J16'].value = total_data['12']['sum'][0]
+        self.workSh['A11'].value = flt['07']['sum'][1]
+        self.workSh['J11'].value = flt['07']['sum'][0]
+        self.workSh['A12'].value = flt['08']['sum'][1]
+        self.workSh['J12'].value = flt['08']['sum'][0]
+        self.workSh['A13'].value = flt['09']['sum'][1]
+        self.workSh['J13'].value = flt['09']['sum'][0]
+        self.workSh['A14'].value = flt['10']['sum'][1]
+        self.workSh['J14'].value = flt['10']['sum'][0]
+        self.workSh['A15'].value = flt['11']['sum'][1]
+        self.workSh['J15'].value = flt['11']['sum'][0]
+        self.workSh['A16'].value = flt['12']['sum'][1]
+        self.workSh['J16'].value = flt['12']['sum'][0]
         self.workSh['A17'].value = 'YEAR TOTALS'
+        self.workSh['J17'].value = total_data.year_sum
         self.workSh['A18'].value = 'TOTALS prev.YEARS'
         self.workSh['A19'].value = 'TOTALS TO DATE'
 
@@ -146,13 +154,16 @@ class Report:
         hvw_array = ['J2', 'G2', 'D2', 'C2', 'B2']
 
         for cel in self.workSh['J4':'J19']:
+            cel[0].font = Font(bold=True)
+            cel[0].border = set_border
             cel[0].alignment = hv_alignment
 
         for cel in hv_array:
             self.workSh[cel].alignment = hv_alignment
-
         for cel in hvw_array:
             self.workSh[cel].alignment = hvw_alignment
+        for cel in self.workSh['A':'J']:
+            pass
 
     # prepare print options
     def set_print_option(self):

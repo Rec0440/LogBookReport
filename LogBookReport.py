@@ -13,16 +13,22 @@ from FlightTime import FlightTime
 
 # testing
 FileName = 'PILOT_LOG_532.xlsx'
-result_wb = Report(FileName)
-TotalFT = FlightTime()
-result_wb.collect_time(TotalFT.YearTimeList)
+wb = Report(FileName)
 
-print('Start application at: ' + str(result_wb.ExecutionTime) + '\n')
-print('create worksheet: ' + result_wb.workSh.title, end='')
+# collect time into months array
+flight_time = FlightTime()
+wb.collect_time(flight_time)
+
+print('Start application at: ' + str(wb.ExecutionTime) + '\n')
+print('create worksheet: ' + wb.workSh.title, end='')
 print(' at file : ' + FileName)
 
-TotalFT.calc_month_sum()  # calculate time by month
-TotalFT.JAN_JUN_sum()
-result_wb.create_workspace(TotalFT.YearTimeList)
-result_wb.set_print_option()
-result_wb.save_summaries()
+# calculate all periods
+flight_time.calc_month_sum()  # calculate time by month
+flight_time.JAN_JUN_sum = flight_time.calc_period(0, 6)
+flight_time.year_sum = flight_time.calc_period(0, 13)
+
+wb.create_workspace(flight_time)
+
+wb.set_print_option()
+wb.save_summaries()

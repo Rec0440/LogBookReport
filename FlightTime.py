@@ -1,42 +1,47 @@
 '''
-
+Структура даних, для зберігання оброленої інформації
 '''
+
+import datetime
 
 
 class FlightTime:
     # data structure for collect and sum time by month
-    YearTimeList = {'01': {'hour': [], 'min': [], 'sum': [0, 'JAN']},
-                    '02': {'hour': [], 'min': [], 'sum': [0, 'FEB']},
-                    '03': {'hour': [], 'min': [], 'sum': [0, 'MAR']},
-                    '04': {'hour': [], 'min': [], 'sum': [0, 'APR']},
-                    '05': {'hour': [], 'min': [], 'sum': [0, 'MAY']},
-                    '06': {'hour': [], 'min': [], 'sum': [0, 'JUN']},
-                    '07': {'hour': [], 'min': [], 'sum': [0, 'JUL']},
-                    '08': {'hour': [], 'min': [], 'sum': [0, 'AUG']},
-                    '09': {'hour': [], 'min': [], 'sum': [0, 'SEP']},
-                    '10': {'hour': [], 'min': [], 'sum': [0, 'OCT']},
-                    '11': {'hour': [], 'min': [], 'sum': [0, 'NOV']},
-                    '12': {'hour': [], 'min': [], 'sum': [0, 'DEC']}}
-    list_month = YearTimeList.keys()
-    YearSummary = {'Hour': [], 'min': []}
-    JAN_JUN_sum = {'Hour': [], 'min': []}
+    months_digits = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+    months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    months_flight_time = {}  # main data structure
+    year_sum = ''
+    JAN_JUN_sum = ''
 
+    # create main data structure
+    def __init__(self):  # dict  --->  '01': {'hour': [], 'min': [], 'sum': [0, 'JAN']} ...
+                         # dict  --->  '12': {'hour': [], 'min': [], 'sum': [0, 'DEC']}
+        self.months_flight_time = {ind: {'hour': [], 'min': [], 'sum': [0, mon]}
+                                   for ind, mon in zip(self.months_digits, self.months)}
+
+    # calculate day_time by months
     def calc_month_sum(self):
         ''' Calculate time from month '''
-        for lik in self.list_month:
-            minutes = sum(self.YearTimeList[lik]['min'])
-            calcmin = minutes % 60
-            calchour = minutes // 60
-            calchour = calchour + sum(self.YearTimeList[lik]['hour'])
-            month_result = str(calchour) + ':' + str('%02d' % calcmin)
-            self.YearTimeList[lik]['sum'][0] = month_result
+        for lik in self.months_digits:
+            minutes = sum(self.months_flight_time[lik]['min'])
+            calc_min = minutes % 60
+            calc_hour = minutes // 60
+            calc_hour = calc_hour + sum(self.months_flight_time[lik]['hour'])
+            # timeform = datetime.timedelta(hours=calc_hour, minutes=calc_min)  its not working right now
+            month_result = str(calc_hour) + ':' + str('%02d' % calc_min)
+            self.months_flight_time[lik]['sum'][0] = month_result
 
-    def calc_jan_jun(self):
-        for lik in self.list_month[:5]:
-            minutes = sum(self.YearTimeList[lik]['min'])
-            calcmin = minutes % 60
-            calchour = minutes // 60
-            calchour = calchour + sum(self.YearTimeList[lik]['hour'])
-            month_res = str(calchour) + ':' + str('%02d' % calcmin)
-            self.JAN_JUN_sum = month_res
-
+    # calculate months_time by start-stop period - use to get 6 months total flight time
+    def calc_period(self, start, stop):
+        minutes = []
+        hours = []
+        for lik in self.months_digits[start:stop]:
+            hour, mint, sec = self.months_flight_time[lik]['sum'][0].split(':')
+            minutes.append(int(mint))
+            hours.append(int(hour))
+        m = sum(minutes)
+        calc_m = m % 60
+        calc_h = m // 60
+        calc_h = calc_h + sum(hours)
+        period = str(calc_h) + ':' + str('%02d' % calc_m) # delete soon
+        return period
