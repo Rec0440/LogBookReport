@@ -1,8 +1,6 @@
-'''
+"""
 Структура даних, для зберігання оброленої інформації
-'''
-
-import datetime
+"""
 
 
 class FlightTime:
@@ -36,12 +34,12 @@ class FlightTime:
         minutes = []
         hours = []
         for lik in self.months_digits[start:stop]:
-            hour, mint, sec = self.months_flight_time[lik]['sum'][0].split(':')
+            hour, mint = self.months_flight_time[lik]['sum'][0].split(':')
             minutes.append(int(mint))
             hours.append(int(hour))
         m = sum(minutes)
         calc_m = m % 60
         calc_h = m // 60
         calc_h = calc_h + sum(hours)
-        period = str(calc_h) + ':' + str('%02d' % calc_m) # delete soon
+        period = str(calc_h) + ':' + str('%02d' % calc_m)
         return period

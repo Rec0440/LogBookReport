@@ -1,13 +1,13 @@
-'''
+"""
 тут - модель даних для обробки Excel-файлу,
 
 відкрити файл,
 обрахувати дані,
 створити листок YearSummary-звіт,
 додати в кінець workbook
-'''
+"""
 
-from openpyxl.styles import Alignment, Font, NamedStyle, Border, Side
+from openpyxl.styles import Alignment, Font, Border, Side
 from openpyxl import load_workbook
 from datetime import datetime
 
@@ -62,39 +62,40 @@ class Report:
         flt = total_data.months_flight_time
 
         # Style preparing
+        ft = Font(bold=True)
         bd = Side(style='medium')
         set_border = Border(left=bd, bottom=bd, right=bd, top=bd)
+        hv_alignment = Alignment(horizontal='center', vertical='center')
+        hvw_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        wr_alignment = Alignment(wrap_text=True)
 
+        hv_array = ['H2', 'H3', 'I3', 'F2', 'E2', 'B1', 'A2', 'A1',
+                    'J4', 'J5', 'J6', 'J7', 'J8', 'J9', 'J10', 'J11',
+                    'J12', 'J13', 'J14', 'J15', 'J16', 'J17', 'J18', 'J19']
+        hvw_array = ['J2', 'G2', 'D2', 'C2', 'B2']
 
         # insert current time into A1
         self.workSh['A1'].value = self.ExecutionTime.strftime('%d-%m-%y')
 
         #    HEADER
         self.workSh.merge_cells('B1:J1')
-        cell_b1 = self.workSh['B1']
-        cell_b1.value = 'PILOT RECORD/Облік польотів'
-
+        self.workSh['B1'] = 'PILOT RECORD/Облік польотів'
         self.workSh.merge_cells('A2:A3')
-        cell_a2 = self.workSh['A2']
-        cell_a2.value = 'Year: 20' + self.default_year
+        self.workSh['A2'] = 'Year: 20' + self.default_year
         self.workSh.column_dimensions['A'].width = 16
 
         self.workSh.merge_cells('B2:B3')
         self.workSh['B2'] = 'SINGLE-ENGINE'
         self.workSh.column_dimensions['B'].width = 11.0
-
         self.workSh.merge_cells('C2:C3')
         self.workSh['C2'] = 'MULTI-ENGINE'
         self.workSh.column_dimensions['C'].width = 11.0
-
         self.workSh.merge_cells('D2:D3')
         self.workSh['D2'] = 'MULTI-ENGINE MULTI-PILOT'
         self.workSh.column_dimensions['D'].width = 14
-
         self.workSh.merge_cells('E2:E3')
         self.workSh['E2'].value = 'JET'
         self.workSh.column_dimensions['E'].width = 7.0
-
         self.workSh.merge_cells('F2:F3')
         self.workSh['F2'].value = 'TURBOPROP'
         self.workSh.column_dimensions['F'].width = 12
@@ -102,15 +103,12 @@ class Report:
         self.workSh.merge_cells('G2:G3')
         self.workSh['G2'] = 'TOTAL FLIGHT TIME'
         self.workSh.column_dimensions['G'].width = 14
-
         self.workSh.merge_cells('H2:I2')
         self.workSh['H2'].value = 'LANDINGS'
-
         self.workSh['H3'].value = 'DAY'
         self.workSh.column_dimensions['H'].width = 5
         self.workSh['I3'].value = 'NIGHT'
         self.workSh.column_dimensions['I'].width = 7
-
         self.workSh.merge_cells('J2:J3')
         self.workSh['J2'] = 'LANDINGS TOTAL'
         self.workSh.column_dimensions['J'].width = 10
@@ -145,25 +143,18 @@ class Report:
         self.workSh['A17'].value = 'YEAR TOTALS'
         self.workSh['J17'].value = total_data.year_sum
         self.workSh['A18'].value = 'TOTALS prev.YEARS'
+        self.workSh['A18'].alignment = wr_alignment
         self.workSh['A19'].value = 'TOTALS TO DATE'
 
         # set styles and alignment
-        hv_alignment = Alignment(horizontal='center', vertical='center')
-        hvw_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-        hv_array = ['H2', 'H3', 'I3', 'F2', 'E2', 'B1', 'A2']
-        hvw_array = ['J2', 'G2', 'D2', 'C2', 'B2']
-
-        for cel in self.workSh['J4':'J19']:
-            cel[0].font = Font(bold=True)
-            cel[0].border = set_border
-            cel[0].alignment = hv_alignment
-
         for cel in hv_array:
             self.workSh[cel].alignment = hv_alignment
         for cel in hvw_array:
             self.workSh[cel].alignment = hvw_alignment
-        for cel in self.workSh['A':'J']:
-            pass
+        for col in self.workSh.columns:
+            for cel in col:
+                cel.font = ft
+                cel.border = set_border
 
     # prepare print options
     def set_print_option(self):
