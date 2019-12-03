@@ -14,7 +14,7 @@ from datetime import datetime
 
 class Report:
     # create workbook
-    def __init__(self, filename, year='2019'):
+    def __init__(self, filename, year):
         self.filename = filename                                # name of datafile
         self.default_year = year[2:]                            # two last digit of def year
         self.workb = load_workbook(filename)                    # data workbook
@@ -163,7 +163,3 @@ class Report:
     # save result of calculating
     def save_summaries(self):
         self.workb.save(self.filename)
-
-
-if __name__ != '__main__':
-    print('Execute TimeCalculate.py')

@@ -19,7 +19,6 @@ class FlightTime:
 
     # calculate day_time by months
     def calc_month_sum(self):
-        ''' Calculate time from month '''
         for lik in self.months_digits:
             minutes = sum(self.months_flight_time[lik]['min'])
             calc_min = minutes % 60
