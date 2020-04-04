@@ -6,19 +6,21 @@ from wrapper import Wrapper
 
 
 # main class
-class LogBookReport:
+class LogBookReport(QWidget):
     def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
         self.file_name = ''                                                 # Excel-File name
         self.calc_year = ''                                                 # Period for calculate
         self.wr = None                                                      # controller referenced object
         self.list_xlsx = [f for f in listdir(getcwd()) if '.xlsx' in f]     # future excel-filename list
         self.default_comboBox1 = 0                                          # default value for file_name_comboBox
 
-        self.app = QApplication(argv)                       # Qt main application
-        self.window = QWidget()                             # Qt widget
-        self.window.setWindowTitle("LogBook")
-        self.window.setWindowIcon(QIcon('titleicon.png'))
-        self.window.setFixedSize(300, 180)
+        self.setWindowTitle("LogBook")
+        self.setWindowIcon(QIcon('titleicon.png'))
+        self.setFixedSize(300, 180)
         self.lab1 = QLabel('Choose File name')
         self.filename_comboBox = QComboBox()
         self.set_values_fname_combo()
@@ -37,7 +39,8 @@ class LogBookReport:
         self.box.addWidget(self.lab2)
         self.box.addWidget(self.period_comboBox)
         self.box.addWidget(self.calculate_btn)
-        self.window.setLayout(self.box)
+        self.setLayout(self.box)
+        self.show()
 
     # handler button click
     def on_clicked(self):
@@ -60,11 +63,9 @@ class LogBookReport:
         for i in range(2019, 2029):
             self.period_comboBox.addItem(str(i))
 
-    def run_report(self):
-        self.window.show()
-        exit(self.app.exec_())
-
 
 if __name__ == '__main__':
+
+    app = QApplication(argv)   # Qt main application
     LogBookReportApp = LogBookReport()
-    LogBookReportApp.run_report()
+    exit(app.exec_())
