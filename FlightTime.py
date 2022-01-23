@@ -66,6 +66,8 @@ class FlightTime:
                                         'INSTRUCTOR': ''}
 
     # methods that filling all summary values
+
+    # co-methods
     # calculate flight_time by months - using by another function
     def month_sum(self, current_month, topic):
         minutes = sum(self.main_data[current_month]['flight_time'][topic]['min'])
@@ -74,6 +76,12 @@ class FlightTime:
         calc_hour = calc_hour + sum(self.main_data[current_month]['flight_time'][topic]['hour'])
         month_result = str(calc_hour) + ':' + str('%02d' % calc_min)
         return month_result
+
+    def jump_to_datetime(self, cel, workbook, sheet):
+        while str(type(cel)) != "<class 'datetime.time'>":
+            if isinstance(cel, str) and cel[0] == '=':
+                cel = workbook[sheet][cel[1:]].value[1:]
+        return cel
 
     # collect all single_engine values from sheets to main data structure - main_data
     def collect_single_engine(self, name_sheets, workbook, yr, end='56'):
@@ -86,7 +94,7 @@ class FlightTime:
                     if isinstance(col_0, datetime):       # try find date type
                         if col_0.strftime('%y') != year:  # collect only 1 year, if trying collect another year - break
                             continue
-                        month = col_0.strftime('%m')      # '07' - month
+                        month = col_0.strftime('%m')
                         if row[7].value and not row[9].value:
                             data = str(row[10].value)     # take col'J', "time of flight'
                             h, m, s = data.split(':')
@@ -113,7 +121,7 @@ class FlightTime:
                     if isinstance(col_0, datetime):
                         if col_0.strftime('%y') != year:
                             continue
-                        month = col_0.strftime('%m')  # '07' - month
+                        month = col_0.strftime('%m')
                         if row[8].value and not row[9].value:
                             data = str(row[10].value)  # take col'J', "time of flight'
                             h, m, s = data.split(':')
